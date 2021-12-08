@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="XsbHFAPEfGZwDkiouJz8Oi8U7_pVxMcGb14KhOFjDWc">
+  <meta name="msvalidate.01" content="147A6A17081B9D4CD8291B703C991D61">
+  <meta name="yandex-verification" content="2e6fb825297ac49f">
+  <meta name="baidu-site-verification" content="code-boR0c7DdL4">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"vkali.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.8.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="此创建虚拟机的脚本为使用虚拟机xml文件为模板创建，非virt-install命令。当然，用virt-install命令也可以，但没有xml文件灵活，胜在方便简洁。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KVM创建虚拟机的改良版脚本">
+<meta property="og:url" content="https://vkali.com/archives/3dac0d9c.html">
+<meta property="og:site_name" content="YinXin’s Blog">
+<meta property="og:description" content="此创建虚拟机的脚本为使用虚拟机xml文件为模板创建，非virt-install命令。当然，用virt-install命令也可以，但没有xml文件灵活，胜在方便简洁。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-09-29T12:00:42.000Z">
+<meta property="article:modified_time" content="2020-10-09T13:54:33.060Z">
+<meta property="article:author" content="隐心">
+<meta property="article:tag" content="kvm虚拟机">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://vkali.com/archives/3dac0d9c.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://vkali.com/archives/3dac0d9c.html","path":"archives/3dac0d9c.html","title":"KVM创建虚拟机的改良版脚本"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>KVM创建虚拟机的改良版脚本 | YinXin’s Blog</title>
+  
+
+
+
+<link rel="dns-prefetch" href="https://vkali-api.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">YinXin’s Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生如逆旅，我亦是行人。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+        <li class="menu-item menu-item-bbs"><a href="https://devnetops.co/" rel="noopener" target="_blank"><i class="fa fa-anchor fa-fw"></i>网络自动化论坛</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#centos%E5%BA%95%E5%B1%82%E9%95%9C%E5%83%8F%EF%BC%88minimal%E5%AE%89%E8%A3%85%EF%BC%89"><span class="nav-text">centos底层镜像（minimal安装）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="nav-text">XML文件内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E6%A1%A5%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="nav-text">网桥文件内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E"><span class="nav-text">变量声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%84%9A%E6%9C%AC%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="nav-text">脚本文件内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E9%94%99%E6%80%9D%E8%B7%AF"><span class="nav-text">排错思路</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="隐心"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">隐心</p>
+  <div class="site-description" itemprop="description">生命的意义在于不停地折腾</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">71</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://vkali.com/archives/3dac0d9c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="隐心">
+      <meta itemprop="description" content="生命的意义在于不停地折腾">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YinXin’s Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          KVM创建虚拟机的改良版脚本
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-09-29 20:00:42" itemprop="dateCreated datePublished" datetime="2019-09-29T20:00:42+08:00">2019-09-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2020-10-09 21:54:33" itemprop="dateModified" datetime="2020-10-09T21:54:33+08:00">2020-10-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/archives/3dac0d9c.html#waline-comments" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" id="/archives/3dac0d9c.html" data-xid="/archives/3dac0d9c.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>6.9k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>此创建虚拟机的脚本为使用虚拟机xml文件为模板创建，非virt-install命令。当然，用virt-install命令也可以，但没有xml文件灵活，胜在方便简洁。</p>
+<span id="more"></span>
+
+<h2 id="centos底层镜像（minimal安装）"><a href="#centos底层镜像（minimal安装）" class="headerlink" title="centos底层镜像（minimal安装）"></a>centos底层镜像（minimal安装）</h2><p>此底层镜像minimal安装，配置了阿里云的yum源，以及关闭了firewalld和selinux，自启动iptables，也安装了一些常用的软件包，也删除了所有的Mac地址和UUID信息防止虚拟机冲突。 也可以自己制作底层镜像。 网盘链接：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1uOwHN6E1Yhp3fsIkO7b66w">https://pan.baidu.com/s/1uOwHN6E1Yhp3fsIkO7b66w</a> 提取码：29mp MD5校验码：f327b2c07b7fcd445ea4e5350c4c3c89 默认存放路径：/var/lib/libvirt/images/CentOS7.qcow2</p>
+<h2 id="XML文件内容"><a href="#XML文件内容" class="headerlink" title="XML文件内容"></a>XML文件内容</h2><p>默认存放路径： /etc/libvirt/qemu/CentOS7.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">&lt;domain type=&#x27;kvm&#x27;&gt;</span><br><span class="line">  &lt;name&gt;NAME&lt;/name&gt;</span><br><span class="line">  &lt;memory unit=&#x27;GiB&#x27;&gt;MEM&lt;/memory&gt;</span><br><span class="line">  &lt;currentMemory unit=&#x27;GiB&#x27;&gt;MEM&lt;/currentMemory&gt;</span><br><span class="line">  &lt;vcpu placement=&#x27;static&#x27;&gt;VCPU&lt;/vcpu&gt;</span><br><span class="line">  &lt;os&gt;</span><br><span class="line">    &lt;type arch=&#x27;x86_64&#x27; machine=&#x27;pc-i440fx-rhel7.0.0&#x27;&gt;hvm&lt;/type&gt;</span><br><span class="line">    &lt;boot dev=&#x27;hd&#x27;/&gt;</span><br><span class="line">  &lt;/os&gt;</span><br><span class="line">  &lt;features&gt;</span><br><span class="line">    &lt;acpi/&gt;</span><br><span class="line">    &lt;apic/&gt;</span><br><span class="line">  &lt;/features&gt;</span><br><span class="line">  &lt;cpu mode=&#x27;custom&#x27; match=&#x27;exact&#x27; check=&#x27;partial&#x27;&gt;</span><br><span class="line">    &lt;model fallback=&#x27;allow&#x27;&gt;Broadwell-noTSX-IBRS&lt;/model&gt;</span><br><span class="line">  &lt;/cpu&gt;</span><br><span class="line">  &lt;on_poweroff&gt;destroy&lt;/on_poweroff&gt;</span><br><span class="line">  &lt;on_reboot&gt;restart&lt;/on_reboot&gt;</span><br><span class="line">  &lt;on_crash&gt;destroy&lt;/on_crash&gt;</span><br><span class="line">  &lt;pm&gt;</span><br><span class="line">    &lt;suspend-to-mem enabled=&#x27;no&#x27;/&gt;</span><br><span class="line">    &lt;suspend-to-disk enabled=&#x27;no&#x27;/&gt;</span><br><span class="line">  &lt;/pm&gt;</span><br><span class="line">  &lt;devices&gt;</span><br><span class="line">    &lt;emulator&gt;/usr/libexec/qemu-kvm&lt;/emulator&gt;</span><br><span class="line">    &lt;disk type=&#x27;file&#x27; device=&#x27;disk&#x27;&gt;</span><br><span class="line">      &lt;driver name=&#x27;qemu&#x27; type=&#x27;qcow2&#x27;/&gt;</span><br><span class="line">      &lt;source file=&#x27;/var/lib/libvirt/images/NAME.img&#x27;/&gt;</span><br><span class="line">      &lt;target dev=&#x27;vda&#x27; bus=&#x27;virtio&#x27;/&gt;</span><br><span class="line">    &lt;/disk&gt;</span><br><span class="line">    &lt;controller type=&#x27;pci&#x27; index=&#x27;0&#x27; model=&#x27;pci-root&#x27;/&gt;</span><br><span class="line">    &lt;controller type=&#x27;ide&#x27; index=&#x27;0&#x27;&gt;</span><br><span class="line">    &lt;/controller&gt;</span><br><span class="line">    &lt;controller type=&#x27;virtio-serial&#x27; index=&#x27;0&#x27;&gt;</span><br><span class="line">    &lt;/controller&gt;</span><br><span class="line">    &lt;interface type=&#x27;network&#x27;&gt;</span><br><span class="line">      &lt;source network=&#x27;vbr1&#x27;/&gt;</span><br><span class="line">      &lt;model type=&#x27;virtio&#x27;/&gt;</span><br><span class="line">    &lt;/interface&gt;</span><br><span class="line">    &lt;interface type=&#x27;network&#x27;&gt;</span><br><span class="line">      &lt;source network=&#x27;vbr2&#x27;/&gt;</span><br><span class="line">      &lt;model type=&#x27;virtio&#x27;/&gt;</span><br><span class="line">    &lt;/interface&gt;</span><br><span class="line">    &lt;serial type=&#x27;pty&#x27;&gt;</span><br><span class="line">      &lt;target type=&#x27;isa-serial&#x27; port=&#x27;0&#x27;&gt;</span><br><span class="line">        &lt;model name=&#x27;isa-serial&#x27;/&gt;</span><br><span class="line">      &lt;/target&gt;</span><br><span class="line">    &lt;/serial&gt;</span><br><span class="line">    &lt;console type=&#x27;pty&#x27;&gt;</span><br><span class="line">      &lt;target type=&#x27;serial&#x27; port=&#x27;0&#x27;/&gt;</span><br><span class="line">    &lt;/console&gt;</span><br><span class="line">    &lt;channel type=&#x27;unix&#x27;&gt;</span><br><span class="line">      &lt;target type=&#x27;virtio&#x27; name=&#x27;org.qemu.guest_agent.0&#x27;/&gt;</span><br><span class="line">    &lt;/channel&gt;</span><br><span class="line">    &lt;channel type=&#x27;spicevmc&#x27;&gt;</span><br><span class="line">      &lt;target type=&#x27;virtio&#x27; name=&#x27;com.redhat.spice.0&#x27;/&gt;</span><br><span class="line">    &lt;/channel&gt;</span><br><span class="line">    &lt;input type=&#x27;tablet&#x27; bus=&#x27;usb&#x27;&gt;</span><br><span class="line">    &lt;/input&gt;</span><br><span class="line">    &lt;input type=&#x27;mouse&#x27; bus=&#x27;ps2&#x27;/&gt;</span><br><span class="line">    &lt;input type=&#x27;keyboard&#x27; bus=&#x27;ps2&#x27;/&gt;</span><br><span class="line">    &lt;graphics type=&#x27;spice&#x27; autoport=&#x27;yes&#x27;&gt;</span><br><span class="line">      &lt;listen type=&#x27;address&#x27;/&gt;</span><br><span class="line">      &lt;image compression=&#x27;off&#x27;/&gt;</span><br><span class="line">    &lt;/graphics&gt;</span><br><span class="line">    &lt;video&gt;</span><br><span class="line">      &lt;model type=&#x27;qxl&#x27; ram=&#x27;65536&#x27; vram=&#x27;65536&#x27; vgamem=&#x27;16384&#x27; heads=&#x27;1&#x27; primary=&#x27;yes&#x27;/&gt;</span><br><span class="line">    &lt;/video&gt;</span><br><span class="line">    &lt;memballoon model=&#x27;virtio&#x27;&gt;</span><br><span class="line">    &lt;/memballoon&gt;</span><br><span class="line">  &lt;/devices&gt;</span><br><span class="line">&lt;/domain&gt;</span><br><span class="line"></span><br><span class="line">#如果修改了虚拟机磁盘的存放路径，注意修改28行虚拟机磁盘存放的位置</span><br><span class="line"># 如果需要在root下，请给root目录加r权限</span><br></pre></td></tr></table></figure>
+
+<h2 id="网桥文件内容"><a href="#网桥文件内容" class="headerlink" title="网桥文件内容"></a>网桥文件内容</h2><p>默认存放路径 /etc/libvirt/qemu/networks/vbr1.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;network&gt;</span><br><span class="line">  &lt;name&gt;vbr1&lt;/name&gt;</span><br><span class="line">  &lt;forward mode=&#x27;nat&#x27;/&gt;</span><br><span class="line">  &lt;bridge name=&#x27;vbr1&#x27; stp=&#x27;on&#x27; delay=&#x27;0&#x27;/&gt;</span><br><span class="line">  &lt;ip address=&#x27;192.168.11.1&#x27; netmask=&#x27;255.255.255.0&#x27;&gt;</span><br><span class="line">    &lt;dhcp&gt;</span><br><span class="line">      &lt;range start=&#x27;192.168.11.50&#x27; end=&#x27;192.168.11.100&#x27;/&gt;</span><br><span class="line">    &lt;/dhcp&gt;</span><br><span class="line">  &lt;/ip&gt;</span><br><span class="line">&lt;/network&gt;</span><br><span class="line">#去除了uuid和mac地址，定义时可自动生成</span><br></pre></td></tr></table></figure>
+
+<h2 id="变量声明"><a href="#变量声明" class="headerlink" title="变量声明"></a>变量声明</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">clone_img=用于cow的底层镜像（模板机）</span><br><span class="line">clone_xml=用于创建虚拟机的xml配置文件</span><br><span class="line">host_img=创建的虚拟机的磁盘存放路径</span><br><span class="line">host_xml=创建的虚拟机的xml文件存放路径</span><br></pre></td></tr></table></figure>
+
+<h2 id="脚本文件内容"><a href="#脚本文件内容" class="headerlink" title="脚本文件内容"></a>脚本文件内容</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line"></span><br><span class="line">#源镜像和源xml文件的路径</span><br><span class="line">src_img=&quot;/var/lib/libvirt/images/virtualmachine/centos7.qcow2&quot;</span><br><span class="line">src_xml=&quot;/etc/libvirt/qemu/centos7.xml&quot;</span><br><span class="line"></span><br><span class="line">#克隆机镜像和xml文件存放的路径</span><br><span class="line">dest_img_dir=&quot;/var/lib/libvirt/images/img/&quot;</span><br><span class="line">dest_xml_dir=&quot;/etc/libvirt/qemu/xml/&quot;</span><br><span class="line"></span><br><span class="line">#判断路径变量是否存在</span><br><span class="line">if [ ! -f $src_img ];then</span><br><span class="line">        echo &quot;Erroy: No found $src_img&quot; </span><br><span class="line">        exit 3</span><br><span class="line">fi</span><br><span class="line">if [ ! -f $src_xml ];then</span><br><span class="line">        echo &quot;Erroy: No found $src_xml&quot; </span><br><span class="line">        exit 3</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">[ -d $dest_img_dir ]  mkdir $dest_img_dir</span><br><span class="line">[ -d $dest_xml_dir ]  mkdir $dest_xml_dir</span><br><span class="line"></span><br><span class="line">#判断需要创建的虚拟机名字是否存在</span><br><span class="line">read -p &#x27;name  :  &#x27; name</span><br><span class="line">  [ -z &quot;$name&quot; ] &amp;&amp; echo -e &amp;&amp; echo &quot;name is empty&quot; &gt;&amp;2  &amp;&amp; exit 1</span><br><span class="line">  for i in virsh list --all  awk &#x27;&#123;print $2&#125;&#x27;  sed &#x27;1,2d;$d&#x27;</span><br><span class="line">    do</span><br><span class="line">      [ $name == $i ] &amp;&amp; echo &quot;name is conflict&quot; &gt;&amp;2 &amp;&amp; exit 2</span><br><span class="line">  done</span><br><span class="line"></span><br><span class="line">#判断内存变量是否合理并不超过8</span><br><span class="line">read -p &#x27;mem(G)   :[2]  &#x27; mem</span><br><span class="line">  mem=$&#123;mem:-2&#125;</span><br><span class="line">  [ -z &quot;$mem&quot; ] &amp;&amp;  echo -e &amp;&amp; echo &quot;mem is empty&quot; &gt;&amp;2 &amp;&amp; exit 1</span><br><span class="line">  if [[ $mem = *[!0-9]* ]]; then</span><br><span class="line">      echo -e</span><br><span class="line">      echo &quot;mem only is integer&quot; &gt;&amp;2</span><br><span class="line">      exit 2</span><br><span class="line">  fi</span><br><span class="line">  [ $mem -gt 8 ] &amp;&amp; echo -e &amp;&amp; echo &quot;mem is too large&quot; &gt;&amp;2 &amp;&amp; exit 3</span><br><span class="line"></span><br><span class="line">#判断cpu变量是否合理</span><br><span class="line">read -p &#x27;cpu   :[1]  &#x27; cpu</span><br><span class="line">  cpu=$&#123;cpu:-1&#125;</span><br><span class="line">  [ -z &quot;$cpu&quot; ] &amp;&amp;  echo -e &amp;&amp; echo &quot;cpu is empty&quot; &gt;&amp;2 &amp;&amp; exit 1</span><br><span class="line">  if [[ $cpu = *[!0-9]* ]]; then</span><br><span class="line">      echo -e</span><br><span class="line">      echo &quot;cpu only is integer&quot; &gt;&amp;2</span><br><span class="line">      exit 2</span><br><span class="line">  fi</span><br><span class="line">  [ $cpu -gt 4 ] &amp;&amp; echo -e &amp;&amp; echo &quot;cpu is too large&quot; &amp;&gt;2 &amp;&amp; exit 3</span><br><span class="line"></span><br><span class="line">#创建克隆机模板</span><br><span class="line">qemu-img create -b $src_img -f qcow2 $&#123;dest_img_dir&#125;$&#123;name&#125;.img &amp;&gt; /dev/null</span><br><span class="line">  [ $? -eq 0 ] &amp;&amp; echo -e &quot;\033[1mqemu-img                      \033[32m[Done]\033[0m&quot;</span><br><span class="line">  [ $? -ne 0 ] &amp;&amp; echo -e &quot;\033[1mqemu-img                      \033[31m[Failed]\033[0m&quot;</span><br><span class="line"></span><br><span class="line">#拷贝模板机的xml文件并修改参数</span><br><span class="line">cp $src_xml $&#123;dest_xml_dir&#125;$&#123;name&#125;.xml &amp;&gt; /dev/null</span><br><span class="line">sed -i &quot;s/NAME/$&#123;name&#125;/&quot; $&#123;dest_xml_dir&#125;$&#123;name&#125;.xml &amp;&gt; /dev/null</span><br><span class="line">sed -i &quot;s/MEM/$&#123;mem&#125;/&quot;   $&#123;dest_xml_dir&#125;$&#123;name&#125;.xml &amp;&gt; /dev/null</span><br><span class="line">sed -i &quot;s/VCPU/$&#123;cpu&#125;/&quot;  $&#123;dest_xml_dir&#125;$&#123;name&#125;.xml &amp;&gt; /dev/null</span><br><span class="line"></span><br><span class="line">#定义虚拟机</span><br><span class="line">virsh define $&#123;dest_xml_dir&#125;$&#123;name&#125;.xml &amp;&gt; /dev/null</span><br><span class="line">  [ $? -eq 0 ] &amp;&amp; echo -e &quot;\033[1mvirsh-define                  \033[32m[Done]\033[0m&quot;</span><br><span class="line">  [ $? -ne 0 ] &amp;&amp; echo -e &quot;\033[1mvirsh-define                  \033[31m[Failed]\033[0m&quot;</span><br><span class="line"></span><br><span class="line">#开启虚拟机</span><br><span class="line">virsh start $name &amp;&gt; /dev/null</span><br><span class="line">  [ $? -eq 0 ] &amp;&amp; echo -e &quot;\033[1mstart_host                    \033[32m[Done]\033[0m&quot;</span><br><span class="line">  [ $? -ne 0 ] &amp;&amp; echo -e &quot;\033[1mstart_host                    \033[31m[Failed]\033[0m&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="排错思路"><a href="#排错思路" class="headerlink" title="排错思路"></a>排错思路</h2><p>脚本分三部分，那一部分出错，会报红，哪一部分报红，就重复运行报红部分的命令，把变量替换为实际路径</p>
+<ul>
+<li>  qemu-img，此命令为</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">qemu-img create -b $clone_img -f qcow2</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<pre><code>此命令一般不会出错，出错原因可能是变量有问题，脚本路径不对
+</code></pre>
+<ul>
+<li>virsh-define，命令为</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">virsh define $&#123;host_xml&#125;$&#123;name&#125;.xml</span><br></pre></td></tr></table></figure>
+
+<p>错误原因较多，可能目录没有libvirt的读取权限，可能配置文件错误</p>
+<ul>
+<li>  host_start,命令为</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">virsh start $name</span><br></pre></td></tr></table></figure>
+
+<p>此部分出错原因一般为虚拟机磁盘位置问题</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div>
+  <div class="end-slogan" style="text-align:center;font-size:22px;letter-spacing:10px;user-seclect:none;color:#bbb">----------- 本文结束啦<i class="fa fa-star"></i>感谢您阅读-----------</div>		
+</div>
+          <div class="reward-container">
+  <div></div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="隐心 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="隐心 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>隐心
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://vkali.com/archives/3dac0d9c.html" title="KVM创建虚拟机的改良版脚本">https://vkali.com/archives/3dac0d9c.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/kvm%E8%99%9A%E6%8B%9F%E6%9C%BA/" rel="tag"><i class="fa fa-tag"></i> kvm虚拟机</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/archives/bbcc8e56.html" rel="prev" title="Linux平台下安装Tomcat8.5(centos7)">
+                  <i class="fa fa-chevron-left"></i> Linux平台下安装Tomcat8.5(centos7)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/archives/34505433.html" rel="next" title="Linux平台下用shell脚本批量创建虚拟机（KVM）">
+                  Linux平台下用shell脚本批量创建虚拟机（KVM） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline-comments"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">隐心</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">123k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:52</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("10/09/2020 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 " +hnum + " 小时 " + mnum + " 分 " + snum + " 秒";        
+    }
+setInterval("createtime()",250);
+</script>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"https://vkali.com/archives/3dac0d9c.html"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://vkali-api.vercel.app","placeholder":"Just go go","avatar":"monsterid","pageSize":10,"visitor":false,"comment_count":true,"requiredFields":["nick","mail","link"],"meta":["nick","mail","link"],"libUrl":"//cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js","el":"#waline-comments","path":"/archives/3dac0d9c.html"}</script>
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() => 
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => {
+    new Waline(CONFIG.waline);
+  });
+});
+</script>
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+
+
+
+
+</body>
+</html>
