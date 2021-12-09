@@ -2,16 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://vkali.com/archives/bbc6bc4f.html</loc>
-    
-    <lastmod>2021-12-09</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://vkali.com/archives/ceba52a.html</loc>
+    <loc>https://vkali.com/archives/ede063c3.html</loc>
     
     <lastmod>2021-12-09</lastmod>
     
@@ -29,7 +20,16 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/archives/ede063c3.html</loc>
+    <loc>https://vkali.com/archives/ceba52a.html</loc>
+    
+    <lastmod>2021-12-09</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://vkali.com/archives/bbc6bc4f.html</loc>
     
     <lastmod>2021-12-09</lastmod>
     
@@ -621,13 +621,6 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/%E5%85%89%E7%9B%98%E5%88%BB%E5%BD%95/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://vkali.com/tags/%E6%90%AC%E7%93%A6%E5%B7%A5vps/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -642,21 +635,7 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/V2ray-%E5%A5%88%E9%A3%9E/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://vkali.com/tags/vultr/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://vkali.com/tags/kali-linux/</loc>
+    <loc>https://vkali.com/tags/%E5%85%89%E7%9B%98%E5%88%BB%E5%BD%95/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -670,7 +649,14 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/docker/</loc>
+    <loc>https://vkali.com/tags/vultr/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://vkali.com/tags/V2ray-%E5%A5%88%E9%A3%9E/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -678,6 +664,20 @@
   
   <url>
     <loc>https://vkali.com/tags/kali-Linux/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://vkali.com/tags/kali-linux/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://vkali.com/tags/zabbix/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -698,7 +698,7 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/zabbix/</loc>
+    <loc>https://vkali.com/tags/docker/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -740,6 +740,13 @@
   </url>
   
   <url>
+    <loc>https://vkali.com/tags/Hexo/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://vkali.com/tags/Next/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -755,20 +762,6 @@
   
   <url>
     <loc>https://vkali.com/tags/Waline/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://vkali.com/tags/Hexo/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://vkali.com/tags/OSI%E4%B8%83%E5%B1%82/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -810,6 +803,13 @@
   </url>
   
   <url>
+    <loc>https://vkali.com/tags/OSI%E4%B8%83%E5%B1%82/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://vkali.com/tags/Nornir/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -831,14 +831,14 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/Terminal/</loc>
+    <loc>https://vkali.com/tags/sql%E6%B3%A8%E5%85%A5%EF%BC%8Csqli-labs/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/sql%E6%B3%A8%E5%85%A5%EF%BC%8Csqli-labs/</loc>
+    <loc>https://vkali.com/tags/Terminal/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -873,6 +873,13 @@
   </url>
   
   <url>
+    <loc>https://vkali.com/tags/img%E9%95%9C%E5%83%8F%E5%88%BB%E5%BD%95/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://vkali.com/tags/sqli-labs/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -881,13 +888,6 @@
   
   <url>
     <loc>https://vkali.com/tags/sql%E6%B3%A8%E5%85%A5/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://vkali.com/tags/img%E9%95%9C%E5%83%8F%E5%88%BB%E5%BD%95/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -915,14 +915,21 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/shell%E6%89%B9%E9%87%8F%E5%88%9B%E5%BB%BA%E8%99%9A%E6%8B%9F%E6%9C%BA/</loc>
+    <loc>https://vkali.com/tags/iPtables/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/iPtables/</loc>
+    <loc>https://vkali.com/tags/SSH/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://vkali.com/tags/shell%E6%89%B9%E9%87%8F%E5%88%9B%E5%BB%BA%E8%99%9A%E6%8B%9F%E6%9C%BA/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -936,7 +943,14 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/SSH/</loc>
+    <loc>https://vkali.com/tags/mysql%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://vkali.com/tags/NGINX/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -957,21 +971,7 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/mysql%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://vkali.com/tags/nginx/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://vkali.com/tags/NGINX/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -992,6 +992,13 @@
   </url>
   
   <url>
+    <loc>https://vkali.com/tags/Windows-win10%E5%BC%80ftp%E6%9C%8D%E5%8A%A1/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://vkali.com/tags/VRRP/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -1006,7 +1013,7 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/Windows-win10%E5%BC%80ftp%E6%9C%8D%E5%8A%A1/</loc>
+    <loc>https://vkali.com/tags/vlan%EF%BC%8Ctrunk%E9%85%8D%E7%BD%AE/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -1034,7 +1041,7 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/vlan%EF%BC%8Ctrunk%E9%85%8D%E7%BD%AE/</loc>
+    <loc>https://vkali.com/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E5%A4%87%E4%BB%BD/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -1069,6 +1076,20 @@
   </url>
   
   <url>
+    <loc>https://vkali.com/tags/DHCP%E9%85%8D%E7%BD%AE/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://vkali.com/tags/CTF/</loc>
+    <lastmod>2021-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://vkali.com/tags/dzzoffice/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -1083,7 +1104,7 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/tags/CTF/</loc>
+    <loc>https://vkali.com/tags/linux/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -1091,20 +1112,6 @@
   
   <url>
     <loc>https://vkali.com/tags/lnmp/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://vkali.com/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E5%A4%87%E4%BB%BD/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://vkali.com/tags/linux/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -1119,13 +1126,6 @@
   
   <url>
     <loc>https://vkali.com/tags/Eth-Trunk/</loc>
-    <lastmod>2021-12-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://vkali.com/tags/DHCP%E9%85%8D%E7%BD%AE/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -1155,14 +1155,14 @@
   </url>
   
   <url>
-    <loc>https://vkali.com/categories/Docker/</loc>
+    <loc>https://vkali.com/categories/zabbix/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://vkali.com/categories/zabbix/</loc>
+    <loc>https://vkali.com/categories/Docker/</loc>
     <lastmod>2021-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
