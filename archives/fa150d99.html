@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="XsbHFAPEfGZwDkiouJz8Oi8U7_pVxMcGb14KhOFjDWc">
+  <meta name="msvalidate.01" content="147A6A17081B9D4CD8291B703C991D61">
+  <meta name="yandex-verification" content="2e6fb825297ac49f">
+  <meta name="baidu-site-verification" content="code-boR0c7DdL4">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"vkali.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.8.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="PTP时间同步协议笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PTP高精度时钟同步协议及配置示例">
+<meta property="og:url" content="https://vkali.com/archives/fa150d99.html">
+<meta property="og:site_name" content="YinXin’s Blog">
+<meta property="og:description" content="PTP时间同步协议笔记">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/%E5%9B%BE%E7%89%871.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/%E5%9B%BE%E7%89%872.jpg">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/ptp_1588.png">
+<meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/20100809_1031447_image005_686476_30003_0.png">
+<meta property="article:published_time" content="2022-01-11T12:58:20.000Z">
+<meta property="article:modified_time" content="2022-01-11T14:13:04.289Z">
+<meta property="article:author" content="隐心">
+<meta property="article:tag" content="PTP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/%E5%9B%BE%E7%89%871.png">
+
+
+<link rel="canonical" href="https://vkali.com/archives/fa150d99.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://vkali.com/archives/fa150d99.html","path":"archives/fa150d99.html","title":"PTP高精度时钟同步协议及配置示例"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>PTP高精度时钟同步协议及配置示例 | YinXin’s Blog</title>
+  
+
+
+
+<link rel="dns-prefetch" href="https://vkali-api.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">YinXin’s Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生如逆旅，我亦是行人。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+        <li class="menu-item menu-item-bbs"><a href="https://devnetops.co/" rel="noopener" target="_blank"><i class="fa fa-anchor fa-fw"></i>网络自动化论坛</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#PTP%E7%AE%80%E4%BB%8B"><span class="nav-text">PTP简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PTP%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-text">PTP基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PTP%E5%9F%9F"><span class="nav-text">PTP域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PTP%E7%AB%AF%E5%8F%A3"><span class="nav-text">PTP端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%92%9F%E8%8A%82%E7%82%B9"><span class="nav-text">时钟节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PTP%E6%8B%93%E6%89%91"><span class="nav-text">PTP拓扑</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PTP%E5%90%8C%E6%AD%A5%E5%8E%9F%E7%90%86"><span class="nav-text">PTP同步原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B7%E6%B1%82%E5%BA%94%E7%AD%94%E6%9C%BA%E5%88%B6"><span class="nav-text">请求应答机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%BB%B6%E6%97%B6%E6%9C%BA%E5%88%B6"><span class="nav-text">端延时机制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B"><span class="nav-text">配置示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E6%8D%A2%E6%9C%BA%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B"><span class="nav-text">交换机配置示例</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="隐心"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">隐心</p>
+  <div class="site-description" itemprop="description">生命的意义在于不停地折腾</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://vkali.com/archives/fa150d99.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="隐心">
+      <meta itemprop="description" content="生命的意义在于不停地折腾">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YinXin’s Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PTP高精度时钟同步协议及配置示例
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-01-11 20:58:20 / 修改时间：22:13:04" itemprop="dateCreated datePublished" datetime="2022-01-11T20:58:20+08:00">2022-01-11</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/archives/fa150d99.html#waline-comments" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" id="/archives/fa150d99.html" data-xid="/archives/fa150d99.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>PTP时间同步协议笔记</p>
+<span id="more"></span>
+<h2 id="PTP简介"><a href="#PTP简介" class="headerlink" title="PTP简介"></a>PTP简介</h2><p>在通信网络中，许多业务的正常运行都要求网络时钟同步，即整个网络各设备之间的时间或频率差保持在合理的误差水平内。网络时钟同步包括以下两个概念：</p>
+<ul>
+<li>时间同步：也叫相位同步（Phase synchronization），是指信号之间的频率和相位都保持一致，即信号之间的相位差恒为零。</li>
+<li>频率同步（Frequency synchronization）：也叫时钟同步，是指信号之间在频率或相位上保持某种严格的特定关系，信号在其对应的有效瞬间以同一平均速率出现，以保证通信网络中的所有设备都以相同的速率运行，即信号之间保持恒定的相位差。</li>
+<li>示意图<img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/%E5%9B%BE%E7%89%871.png" style="zoom: 150%;" /></li>
+</ul>
+<p>有两个表Watch A与Watch B，如果这两个表的时间每时每刻都保持一致，这个状态就是时间同步；如果这两个表的时间不一致，但保持一个恒定的差值（如图中的Watch B总比Watch A晚6个小时），这个状态就是频率同步。</p>
+<p>PTP（Precision Time Protocol，精确时间协议）是一种时间同步的协议，其本身只是用于设备之间的高精度时间同步，但也可被借用于设备之间的频率同步。相比现有的各种时间同步机制，PTP具备以下优势：</p>
+<ul>
+<li><p>相比NTP（Network Time Protocol，网络时间协议），PTP能够满足更高精度的时间同步要求：NTP一般只能达到亚秒级的时间同步精度，而PTP则可达到亚微秒级。</p>
+</li>
+<li><p> 相比GPS（Global Positioning System，全球定位系统），PTP具备更低的建设和维护成本，并且由于可以摆脱对GPS的依赖，在国家安全方面也具备特殊的意义。</p>
+</li>
+</ul>
+<h2 id="PTP基本概念"><a href="#PTP基本概念" class="headerlink" title="PTP基本概念"></a>PTP基本概念</h2><h3 id="PTP域"><a href="#PTP域" class="headerlink" title="PTP域"></a>PTP域</h3><p>PTP协议的网络称为PTP域。PTP域内有且只有一个同步时钟，域内的所有设备都与该时钟保持同步。</p>
+<h3 id="PTP端口"><a href="#PTP端口" class="headerlink" title="PTP端口"></a>PTP端口</h3><p>设备上运行了PTP协议的端口成为PTP端口。PTP端口角色分为以下三种：</p>
+<ul>
+<li>主端口（Master Port）：发布同步时间端口，可存在于BC或OC上。</li>
+<li>从端口（Slave Port）: 接收同步时间的端口，可存在于BC或OC上。</li>
+<li>被动端口（Passive Port）： 既不接收同步时间、也不对外发布同步时间的端口，只存在于BC上。</li>
+</ul>
+<h3 id="时钟节点"><a href="#时钟节点" class="headerlink" title="时钟节点"></a>时钟节点</h3><p>PTP域中的节点称为时钟节点，PTP协议定义了以下三种类型的基本时钟节点：</p>
+<ul>
+<li> OC（Ordinary Clock，普通时钟）：该时钟节点在同一个PTP域内只有一个PTP端口参与时间同步，并通过该端口从上游时钟节点同步时间。此外，当时钟节点作为时钟源时，可以只通过一个PTP端口向下游时钟节点发布时间，我们也称其为OC。</li>
+<li>BC（Boundary Clock，边界时钟）：该时钟节点在同一个PTP域内拥有多个PTP端口参与时间同步。它通过其中一个端口从上游时钟节点同步时间，并通过其余端口向下游时钟节点发布时间。此外，当时钟节点作为时钟源时，可以通过多个PTP端口向下游时钟节点发布时间的，我们也称其为BC。</li>
+<li> TC（Transparent clock，透明时钟）：与BC/OC相比，BC/OC需要与其它时钟节点保持时间同步，而TC则不与其它时钟节点保持时间同步。TC有多个PTP端口，但它只在这些端口间转发PTP协议报文并对其进行转发延时校正，而不会通过任何一个端口同步时间。TC包括以下两种类型：</li>
+<li>  E2ETC（End-to-End Transparent Clock，端到端透明时钟）：直接转发网络中非P2P（Peer-to-Peer，点到点）类型的协议报文，并参与计算整条链路的延时。</li>
+<li> P2PTC（Peer-to-Peer Transparent Clock，点到点透明时钟）：只直接转发Sync报文、Follow_Up报文和Announce报文，而终结其它PTP协议报文，并参与计算整条链路上每一段链路的延时。</li>
+</ul>
+<h3 id="PTP拓扑"><a href="#PTP拓扑" class="headerlink" title="PTP拓扑"></a>PTP拓扑</h3><p>最佳主时钟算法(BMCA)用于选择每条链路上的主时钟，并最终选择整个PTP域的根时钟。它在普通和边界时钟的每个端口本地运行，将本地数据集与从Announce消息接收的数据进行比较，以选择链路上的最佳时钟。</p>
+<p><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/%E5%9B%BE%E7%89%872.jpg"></p>
+<h2 id="PTP同步原理"><a href="#PTP同步原理" class="headerlink" title="PTP同步原理"></a>PTP同步原理</h2><p>PTP同步的基本原理如下：主、从时钟之间交互同步报文并记录报文的收发时间，通过计算报文往返的时间差来计算主、从时钟之间的往返总延时，如果网络是对称的（即两个方向的传输延时相同），则往返总延时的一半就是单向延时，这个单向延时便是主、从时钟之间的时钟偏差，从时钟按照该偏差来调整本地时间，就可以实现其与主时钟的同步。</p>
+<p>PTP协议定义了两种传播延时测量机制：请求应答（Requset_Response）机制和端延时（Peer Delay）机制，且这两种机制都以网络对称为前提。</p>
+<h3 id="请求应答机制"><a href="#请求应答机制" class="headerlink" title="请求应答机制"></a>请求应答机制</h3><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/ptp_1588.png" style="zoom:150%;" />
+
+<p>请求应答方式用于端到端的延时测量。其实现过程如下：</p>
+<p>(1)    主时钟向从时钟发送Sync报文，并记录发送时间t1；从时钟收到该报文后，记录接收时间t2。</p>
+<p>(2)    主时钟发送Sync报文之后，紧接着发送一个携带有t1的Follow_Up报文。</p>
+<p>(3)    从时钟向主时钟发送Delay_Req报文，用于发起反向传输延时的计算，并记录发送时间t3；主时钟收到该报文后，记录接收时间t4。</p>
+<p>(4)    主时钟收到Delay_Req报文之后，回复一个携带有t4的Delay_Resp报文。</p>
+<p>此时，从时钟便拥有了t1～t4这四个时间戳，由此可计算出主、从时钟间的往返总延时为[(t2 – t1) + (t4 – t3)]，由于网络是对称的，所以主、从时钟间的单向延时为[(t2 – t1) + (t4 – t3)] / 2。因此，从时钟相对于主时钟的时钟偏差为：Offset = (t2 – t1) - [(t2 – t1) + (t4 – t3)] / 2 = [(t2 – t1) - (t4 – t3) ] / 2。</p>
+<p>此外，根据是否需要发送Follow_Up报文，请求应答机制又分为单步模式和双步模式两种：</p>
+<ul>
+<li><p>在单步模式下，Sync报文的发送时间戳t1由Sync报文自己携带，不发送Follow_Up报文。</p>
+</li>
+<li><p>在双步模式下，Sync报文的发送时间戳t1由Follow_Up报文携带。</p>
+</li>
+</ul>
+<h3 id="端延时机制"><a href="#端延时机制" class="headerlink" title="端延时机制"></a>端延时机制</h3><img data-src="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/20100809_1031447_image005_686476_30003_0.png" style="zoom:150%;" />
+
+
+
+<p>与请求应答机制相比，端延时机制不仅对转发延时进行扣除，还对上游链路的延时进行扣除。其实现过程如下：</p>
+<p>(1)    主时钟向从时钟发送Sync报文，并记录发送时间t1；从时钟收到该报文后，记录接收时间t2。</p>
+<p>(2)    主时钟发送Sync报文之后，紧接着发送一个携带有t1的Follow_Up报文。</p>
+<p>(3)    从时钟向主时钟发送Pdelay_Req报文，用于发起反向传输延时的计算，并记录发送时间t3；主时钟收到该报文后，记录接收时间t4。</p>
+<p>(4)    主时钟收到Pdelay_Req报文之后，回复一个携带有t4的Pdelay_Resp报文，并记录发送时间t5；从时钟收到该报文后，记录接收时间t6。</p>
+<p>(5)    主时钟回复Pdelay_Resp报文之后，紧接着发送一个携带有t5的Pdelay_Resp_Follow_Up报文。</p>
+<p>此时，从时钟便拥有了t1～t6这六个时间戳，由此可计算出主、从时钟间的往返总延时为[(t4 – t3) + (t6 – t5)]，由于网络是对称的，所以主、从时钟间的单向延时为[(t4 – t3) + (t6 – t5)] / 2。因此，从时钟相对于主时钟的时钟偏差为：Offset = (t2 – t1) - [(t4 – t3) + (t6 – t5)] / 2。</p>
+<p>此外，根据是否需要发送Follow_Up报文，端延时机制也分为单步模式和双步模式两种：</p>
+<ul>
+<li><p>在单步模式下，Sync报文的发送时间戳t1由Sync报文自己携带，不发送Follow_Up报文；而t5和t4的差值由Pdelay_Resp报文携带，不发送Pdelay_Resp_Follow_Up报文。</p>
+</li>
+<li><p>在双步模式下，Sync报文的发送时间戳t1由Follow_Up报文携带，而t4和t5则分别由Pdelay_Resp报文和Pdelay_Resp_Follow_Up报文携带。</p>
+</li>
+</ul>
+<h2 id="配置示例"><a href="#配置示例" class="headerlink" title="配置示例"></a>配置示例</h2><h3 id="交换机配置示例"><a href="#交换机配置示例" class="headerlink" title="交换机配置示例"></a>交换机配置示例</h3><p>以Nexus 3548交换机为例，大致配置如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">feature ptp</span><br><span class="line">feature interface-vlan</span><br><span class="line">ptp domain 0</span><br><span class="line">ptp source 10.1.1.1</span><br><span class="line">clock protocol ptp</span><br><span class="line">clock timezone GMT 8 0</span><br><span class="line"></span><br><span class="line">interface T1/48</span><br><span class="line">no switchport</span><br><span class="line">ip address 10.1.1.1/30</span><br><span class="line">ptp</span><br><span class="line">no shutdown</span><br><span class="line"></span><br><span class="line">interface vlan1000</span><br><span class="line">ip address 192.168.8.1/24</span><br><span class="line">no shutdown</span><br><span class="line"></span><br><span class="line">interface T1/1</span><br><span class="line">switchport</span><br><span class="line">switchport access vlan 1000</span><br><span class="line">ptp</span><br><span class="line">ptp vlan 1000</span><br><span class="line">no shutdown</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>配置完上述命令后，如果有时钟同步源的话，可以使用以下命令查看相关信息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">show ptp corrections 检查 PTP 更正时间戳</span><br><span class="line">show ptp clock       查看ptp同步的时间</span><br><span class="line">show ptp parent      PTP 父属性</span><br><span class="line">show ptp brief       ptp接口状态</span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div>
+  <div class="end-slogan" style="text-align:center;font-size:22px;letter-spacing:10px;user-seclect:none;color:#bbb">----------- 本文结束啦<i class="fa fa-star"></i>感谢您阅读-----------</div>		
+</div>
+          <div class="reward-container">
+  <div></div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="隐心 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="隐心 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>隐心
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://vkali.com/archives/fa150d99.html" title="PTP高精度时钟同步协议及配置示例">https://vkali.com/archives/fa150d99.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/PTP/" rel="tag"><i class="fa fa-tag"></i> PTP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/archives/0.html" rel="prev" title="Centos8安装zabbix5.4.7（二）">
+                  <i class="fa fa-chevron-left"></i> Centos8安装zabbix5.4.7（二）
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline-comments"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">隐心</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">138k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">2:06</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("10/09/2020 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 " +hnum + " 小时 " + mnum + " 分 " + snum + " 秒";        
+    }
+setInterval("createtime()",250);
+</script>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":true,"delay":true,"timeout":3000,"priority":true,"url":"https://vkali.com/archives/fa150d99.html"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://vkali-api.vercel.app","placeholder":"Just go go","avatar":"monsterid","pageSize":10,"visitor":false,"comment_count":true,"requiredFields":["nick","mail","link"],"meta":["nick","mail","link"],"libUrl":"//cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js","el":"#waline-comments","path":"/archives/fa150d99.html"}</script>
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() => 
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => {
+    new Waline(CONFIG.waline);
+  });
+});
+</script>
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+
+
+
+
+</body>
+</html>
