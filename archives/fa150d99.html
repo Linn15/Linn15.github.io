@@ -36,7 +36,7 @@
 <meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/ptp_1588.png">
 <meta property="og:image" content="https://vkali-1303828639.cos.ap-hongkong.myqcloud.com/ptp/20100809_1031447_image005_686476_30003_0.png">
 <meta property="article:published_time" content="2022-01-11T12:58:20.000Z">
-<meta property="article:modified_time" content="2022-01-11T14:13:04.289Z">
+<meta property="article:modified_time" content="2022-01-11T14:26:38.328Z">
 <meta property="article:author" content="隐心">
 <meta property="article:tag" content="PTP">
 <meta name="twitter:card" content="summary">
@@ -511,7 +511,7 @@ if(canvas.getContext){
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2022-01-11 20:58:20 / 修改时间：22:13:04" itemprop="dateCreated datePublished" datetime="2022-01-11T20:58:20+08:00">2022-01-11</time>
+      <time title="创建时间：2022-01-11 20:58:20 / 修改时间：22:26:38" itemprop="dateCreated datePublished" datetime="2022-01-11T20:58:20+08:00">2022-01-11</time>
     </span>
 
   
@@ -542,7 +542,7 @@ if(canvas.getContext){
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>3.6k</span>
+      <span>3.7k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -634,7 +634,8 @@ if(canvas.getContext){
 <p>配置完上述命令后，如果有时钟同步源的话，可以使用以下命令查看相关信息。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">show ptp corrections 检查 PTP 更正时间戳</span><br><span class="line">show ptp clock       查看ptp同步的时间</span><br><span class="line">show ptp parent      PTP 父属性</span><br><span class="line">show ptp brief       ptp接口状态</span><br></pre></td></tr></table></figure>
 
-
+<p>在实验时可以搭建一台Linux系统做为PTP时钟源，让交换机与其进行PTP时间同步，这里以Ubuntu为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install ptpd</span><br><span class="line">sudo ptpd -MC -i eth0 此网卡为与交换机相连的网卡</span><br></pre></td></tr></table></figure>
 
 
     </div>
